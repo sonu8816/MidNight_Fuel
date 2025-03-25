@@ -29,12 +29,13 @@ mongoose
 
 
   const corsOptions = {
-   origin: [
-    "https://mid-night-fuel.vercel.app",
-    "https://mid-night-fuel-czdndspx9-sonu-kumars-projects-ad428f9b.vercel.app",
-    "https://mid-night-fuel-qufd.vercel.app",
-    "https://mid-night-fuel-qufd-a1vl8u7th-sonu-kumars-projects-ad428f9b.vercel.app"  // ✅ Added new URL
-  ], // Replace with your frontend's origin
+   origin: (origin, callback) => {
+    if (!origin || origin.includes("mid-night-fuel")) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  }, // Replace with your frontend's origin
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "token", "admintoken" ], // Add your custom headers here
     credentials: true,
