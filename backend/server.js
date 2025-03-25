@@ -29,7 +29,10 @@ mongoose
 
 
   const corsOptions = {
-    origin:["*"], // Replace with your frontend's origin
+    origin: [
+    "https://mid-night-fuel.vercel.app",
+    "https://mid-night-fuel-czdndspx9-sonu-kumars-projects-ad428f9b.vercel.app"
+  ], // Replace with your frontend's origin
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "token", "admintoken" ], // Add your custom headers here
     credentials: true,
