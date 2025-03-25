@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 // let URL = "https://midnight-fuel.onrender.com";
-let URL = "http://localhost:4000";
+// let URL = "http://localhost:4000";
+const URL = import.meta.env.VITE_API_URL;
 
 const initialState = {
   isLoading: false,
