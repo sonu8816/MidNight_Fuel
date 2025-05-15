@@ -48,7 +48,9 @@ app.use('/api/user',userProductRouter)
 app.use('/api/admin',adminRouter)
 app.use('/api/admin',adminControl)
 
-
+app.use('/',(req,res)=>{
+  res.send("API is Working");
+})
 app.listen(PORT, (err)=>{
     if(err)
     console.log(err);
