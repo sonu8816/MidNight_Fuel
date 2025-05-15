@@ -4,26 +4,19 @@ import { loginUser, registerUser } from "../store/seller/authSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const URL = import.meta.env.VITE_API_URL;
-
 const Auth = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const hostels = [
-    "Aryabhatta",
-    "Chanakya",
-    "Sarabhai",
-    "Bose",
-    "Trisha",
-    "Kalpana",
-    "Gargi",
+    "Aryabhatta", "Chanakya", "Sarabhai", "Bose",
+    "Trisha", "Kalpana", "Gargi"
   ];
 
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
+    email: "",  // this will be the prefix only, like "john"
     password: "",
     phone: "",
     UID: "",
@@ -35,26 +28,28 @@ const Auth = () => {
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    if (id === "name") {
-      setFormData({
-        ...formData,
-        [id]: value,
-        email: `${value.trim().toLowerCase()}.midnightSeller@gmail.com`,
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [id]: value,
-      });
-    }
+    setFormData({
+      ...formData,
+      [id]: value,
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Merge email prefix + fixed domain
+    const mergedEmail = formData.email.trim() + ".midnighseller@gmail.com";
+
+    // Create payload with merged email
+    const payload = {
+      ...formData,
+      email: mergedEmail,
+    };
+
     if (isLogin) {
-      dispatch(loginUser(formData))
+      dispatch(loginUser(payload))
         .then((data) => {
-          if (data?.payload?.success == "true") {
+          if (data?.payload?.success === "true") {
             toast.success(data?.payload?.message);
             localStorage.setItem("authToken", JSON.stringify(data?.payload?.token));
             navigate("/seller/orders");
@@ -66,13 +61,13 @@ const Auth = () => {
           toast.error("Invalid credentials");
         });
     } else {
-      dispatch(registerUser(formData))
+      dispatch(registerUser(payload))
         .then((data) => {
           if (data?.payload?.success) {
             toast.success(data?.payload?.message);
             setIsLogin(true);
           } else {
-            toast.error(data.payload.message);
+            toast.error(data?.payload?.message);
           }
         });
     }
@@ -99,13 +94,13 @@ const Auth = () => {
                 <div className="flex items-center space-x-2">
                   <input
                     type="text"
-                    id="name"
-                    value={formData.name}
+                    id="email"
+                    value={formData.email}
                     onChange={handleInputChange}
-                    placeholder="Enter your name prefix"
+                    placeholder="Enter your email prefix"
                     className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md bg-white text-gray-900 placeholder:text-gray-500 focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                   />
-                  <span className="text-gray-700">@midnightSeller.com</span>
+                  <span className="text-gray-700">.midnighseller@gmail.com</span>
                 </div>
               </div>
               <div>
@@ -150,20 +145,36 @@ const Auth = () => {
               Create a new account to get started.
             </p>
             <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-800">
-                    Username:
-                  </label>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-800">
+                  Email:
+                </label>
+                <div className="flex items-center space-x-2">
                   <input
                     type="text"
-                    id="name"
-                    value={formData.name}
+                    id="email"
+                    value={formData.email}
                     onChange={handleInputChange}
-                    placeholder="Enter your Username"
+                    placeholder="Enter your email prefix"
                     className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md bg-white text-gray-900 placeholder:text-gray-500 focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                   />
+                  <span className="text-gray-700">.midnighseller@gmail.com</span>
                 </div>
+              </div>
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-800">
+                  Name:
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="Enter your name"
+                  className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md bg-white text-gray-900 placeholder:text-gray-500 focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-800">
                     Phone:
@@ -173,12 +184,10 @@ const Auth = () => {
                     id="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    placeholder="Enter your Phone number"
+                    placeholder="Enter your phone"
                     className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md bg-white text-gray-900 placeholder:text-gray-500 focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                   />
                 </div>
-              </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="UID" className="block text-sm font-medium text-gray-800">
                     UID:
@@ -192,6 +201,8 @@ const Auth = () => {
                     className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md bg-white text-gray-900 placeholder:text-gray-500 focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                   />
                 </div>
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="hostel" className="block text-sm font-medium text-gray-800">
                     Hostel:
@@ -200,7 +211,7 @@ const Auth = () => {
                     id="hostel"
                     value={formData.hostel}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md bg-white text-gray-900 placeholder:text-gray-500 focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+                    className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                   >
                     <option value="">Select your Hostel</option>
                     {hostels.map((hostel) => (
@@ -210,19 +221,19 @@ const Auth = () => {
                     ))}
                   </select>
                 </div>
-              </div>
-              <div>
-                <label htmlFor="room" className="block text-sm font-medium text-gray-800">
-                  Room:
-                </label>
-                <input
-                  type="text"
-                  id="room"
-                  value={formData.room}
-                  onChange={handleInputChange}
-                  placeholder="Enter your Room number"
-                  className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md bg-white text-gray-900 placeholder:text-gray-500 focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
-                />
+                <div>
+                  <label htmlFor="room" className="block text-sm font-medium text-gray-800">
+                    Room:
+                  </label>
+                  <input
+                    type="text"
+                    id="room"
+                    value={formData.room}
+                    onChange={handleInputChange}
+                    placeholder="Enter your Room number"
+                    className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+                  />
+                </div>
               </div>
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-800">
