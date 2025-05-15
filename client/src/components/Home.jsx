@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Product from "../components/Product";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../Slice/ProductSlice";
@@ -10,47 +10,42 @@ import NewsLetterBox from "./NewsLetterBox";
 import OurPolicy from "./OurPolicy";
 
 function Home() {
-  const [cart, setCart] = useState([]);
+  const productRef = useRef(null);
   const dispatch = useDispatch();
-  const products = useSelector((state) => state.products.items.data);
-  const loading = useSelector((state) => state.products.loading);
-
   const [selectedHostel, setSelectedHostel] = useState("All");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  const products = useSelector((state) => state.products.items.data);
+  const loading = useSelector((state) => state.products.loading);
+
   const hostels = ["All", "Aryabhatta", "Chanakya", "Sarabhai", "Bose", "Trisha", "Kalpana", "Gargi"];
 
-  const addToCart = (product) => {
-    setCart((prevCart) => [...prevCart, product]);
-    alert(`${product.productName} has been added to the cart!`);
+  const scrollToProducts = () => {
+    productRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-
-  const filteredData = selectedHostel === "All"
-    ? products
-    : products?.filter((product) => product.hostelName === selectedHostel);
-
-  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
+  const filteredData =
+    selectedHostel === "All"
+      ? products
+      : products?.filter((product) => product.hostelName === selectedHostel);
+
   return (
     <>
-      <Banner />
+      <Banner onShopClick={scrollToProducts} />
 
-      <div className="text-center py-8 text-3xl bg-[#d8d4d5]">
+      <div ref={productRef} className="text-center py-8 text-3xl bg-[#d8d4d5]">
         <Title text1={"LATEST"} text2={"PRODUCTS"} />
       </div>
 
       <div className="min-h-screen bg-[#f7f7ff] text-white p-6">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-white drop-shadow-md"></h1>
-
-          {/* Dropdown placed on right side */}
           <div className="relative ml-auto">
             <button
-              onClick={toggleDropdown}
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="bg-orange-500 hover:bg-orange-600 px-5 py-2 rounded-lg shadow-md text-white font-medium transition"
             >
               Filter: {selectedHostel}
