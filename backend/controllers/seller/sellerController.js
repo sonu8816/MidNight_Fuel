@@ -7,15 +7,15 @@ async function signupSeller(req, res) {
 
   // console.log(typeOf (hostel), typeOf (room));
   try {
-    if(!name || !email || !password || !phone || !UID || !hostel || !room){
-      return res.status(200).json({ 
+    if (!name || !email || !password || !phone || !UID || !hostel || !room) {
+      return res.status(200).json({
         message: "Please fill all the fields",
-        success: false
+        success: false,
       });
     }
     const existingSeller = await Seller.findOne({ email });
     if (existingSeller) {
-      console.log(existingSeller)
+      console.log(existingSeller);
       return res.status(200).json({
         success: false,
         message: "Seller already exists",
@@ -43,7 +43,7 @@ async function signupSeller(req, res) {
     res.status(201).json({
       success: "true",
       data: sellerSaved,
-      message: "Request sent to Admin"
+      message: "Request sent to Admin",
     });
   } catch (err) {
     console.log("eror is ", err);
@@ -58,7 +58,7 @@ async function loginSeller(req, res) {
   const { email, password } = req.body;
   //console.log('login',email, password)
   try {
-    if(!email || !password){
+    if (!email || !password) {
       return res.status(200).json({
         success: false,
         message: "Email and password are required",
@@ -71,25 +71,26 @@ async function loginSeller(req, res) {
         message: "Invalid credentials",
       });
     }
-    if(!seller.varified){
+    if (!seller.varified) {
       return res.status(200).json({
         success: false,
-        message: "Seller is not varified Please wait..."
+        message: "Seller is not varified Please wait...",
       });
     }
     const token = createToken({ email, sellerId: seller._id });
     res.cookie("authToken", token, {
-      httpOnly: true, // Makes the cookie inaccessible via JavaScript
-      secure: false, // Ensures cookie is sent over HTTPS (set to false for local development)
-      sameSite: "Strict", // Prevents CSRF attacks
-      maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 24 * 60 * 60 * 1000,
     });
+
     req.user = { sellerId: seller._id };
     // console.log("req.user : ", req.user);
     res.status(200).json({
       success: "true",
       data: seller,
-      token
+      token,
     });
   } catch (err) {
     console.log("eror is ", err);
@@ -106,33 +107,33 @@ async function logoutSeller(req, res) {
       httpOnly: true, // Ensure this matches the original cookie settings
       secure: false, // Use true if your app is running over HTTPS
       sameSite: "Strict", // sameSite setting should match
-      maxAge: 0
+      maxAge: 0,
     });
     res.status(200).json({
       message: "Logout Successfully",
-      success: true
-    })
+      success: true,
+    });
   } catch (error) {
     console.log("logout seller: ", error);
     res.status(200).json({
       success: false,
-    })
+    });
   }
 }
 
-async function resetPassword(req, res){
-  const {email, UID, newPassword} = req.body;
-  console.log("reset called : ", email, UID, newPassword)
+async function resetPassword(req, res) {
+  const { email, UID, newPassword } = req.body;
+  console.log("reset called : ", email, UID, newPassword);
   try {
-    if(!email || !UID || !newPassword){
+    if (!email || !UID || !newPassword) {
       return res.status(200).json({
         success: false,
         message: "insufficient Data",
       });
     }
 
-    const userData = await Seller.findOne({email, UID});
-    if(!userData){
+    const userData = await Seller.findOne({ email, UID });
+    if (!userData) {
       return res.status(200).json({
         success: false,
         message: "User not found",
@@ -145,15 +146,13 @@ async function resetPassword(req, res){
     res.status(200).json({
       success: true,
       message: "Password Reset Successfully",
-    })
-
+    });
   } catch (error) {
     console.log("logout seller: ", error);
     res.status(200).json({
       success: false,
-    })
+    });
   }
-
 }
 
-module.exports = { signupSeller, loginSeller, logoutSeller, resetPassword};
+module.exports = { signupSeller, loginSeller, logoutSeller, resetPassword };

@@ -30,15 +30,13 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like Postman or curl)
-      if (!origin) return callback(null, true);
+      if (!origin) return callback(null, true); // allow Postman/curl
 
-      // allow localhost
-      if (allowedOrigins.some((o) => origin.startsWith(o))) {
+      if (allowedOrigins.some(o => origin.startsWith(o))) {
         return callback(null, true);
       }
 
-      // allow all *.vercel.app subdomains
+      // Optional: allow all vercel.app subdomains if you want
       if (origin.endsWith(".vercel.app")) {
         return callback(null, true);
       }
